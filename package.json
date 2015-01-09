@@ -1,0 +1,35 @@
+{
+  "name": "amqplib-easy",
+  "version": "1.0.0",
+  "description": "Simplified API for interacting with AMQP",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint --ignore-path .gitignore .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lanetix/node-amqplib-easy"
+  },
+  "keywords": [
+    "amqp",
+    "promise",
+    "easy"
+  ],
+  "author": "Mike Atkins",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lanetix/node-amqplib-easy/issues"
+  },
+  "homepage": "https://github.com/lanetix/node-amqplib-easy",
+  "devDependencies": {
+    "eslint": "^0.11.0",
+    "eslint-plugin-nodeca": "^1.0.3"
+  },
+  "dependencies": {
+    "amqplib": "^0.3.0",
+    "amqplib-retry": "^1.0.2",
+    "bluebird": "^2.6.2",
+    "lodash.defaults": "^2.4.1"
+  }
+}
