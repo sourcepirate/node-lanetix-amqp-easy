@@ -4,7 +4,7 @@ var defaults = require('lodash.defaults'),
   BPromise = require('bluebird'),
   amqp = require('amqplib'),
   retry = require('amqplib-retry'),
-  connections;
+  connections = {};
 
 module.exports = function (amqpUrl) {
   function connect() {
