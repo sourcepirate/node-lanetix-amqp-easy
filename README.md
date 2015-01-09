@@ -1,0 +1,1 @@
+# node-lanetix-amqp-easy
