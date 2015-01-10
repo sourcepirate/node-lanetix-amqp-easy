@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lanetix/node-amqplib-easy"
+    "url": "https://github.com/lanetix/node-lanetix-amqp-easy"
   },
   "keywords": [
     "amqp",
@@ -19,9 +19,9 @@
   "author": "Mike Atkins",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/lanetix/node-amqplib-easy/issues"
+    "url": "https://github.com/lanetix/node-lanetix-amqp-easy/issues"
   },
-  "homepage": "https://github.com/lanetix/node-amqplib-easy",
+  "homepage": "https://github.com/lanetix/node-lanetix-amqp-easy",
   "devDependencies": {
     "eslint": "^0.11.0",
     "eslint-plugin-nodeca": "^1.0.3"
