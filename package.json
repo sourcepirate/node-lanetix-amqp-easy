@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint --ignore-path .gitignore .",
-    "test": "npm run lint"
+    "test": "npm run lint && node test.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
     "amqplib": "^0.3.0",
     "amqplib-retry": "^1.0.2",
     "bluebird": "^2.6.2",
-    "lodash.defaults": "^2.4.1"
+    "lodash.defaults": "^2.4.1",
+    "tape": "^3.0.3"
   }
 }
