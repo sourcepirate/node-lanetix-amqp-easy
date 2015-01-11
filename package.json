@@ -32,7 +32,7 @@
     "amqplib": "^0.3.0",
     "amqplib-retry": "^1.0.2",
     "bluebird": "^2.6.2",
-    "lodash.defaults": "^2.4.1",
-    "tape": "^3.0.3"
+    "death": "^0.1.0",
+    "lodash.defaults": "^2.4.1"
   }
 }

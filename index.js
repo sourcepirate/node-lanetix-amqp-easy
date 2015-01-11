@@ -4,7 +4,22 @@ var defaults = require('lodash.defaults'),
   BPromise = require('bluebird'),
   amqp = require('amqplib'),
   retry = require('amqplib-retry'),
+  onDeath = require('death')({ uncaughtException: true }),
   connections = {};
+
+onDeath(function () {
+  console.log('closing AMQP connections');
+  BPromise.map(
+    connections,
+    function (connection, connectionUrl) {
+      return connection.close()
+        .then(function () {
+          console.log(connectionUrl, 'closed');
+        });
+    }
+  )
+    .catch(console.error.bind(console, 'failed to close connection because'));
+});
 
 module.exports = function (amqpUrl) {
   function connect() {
