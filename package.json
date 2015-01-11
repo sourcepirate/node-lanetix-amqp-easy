@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint --ignore-path .gitignore .",
-    "test": "npm run lint"
+    "test": "npm run lint && mocha"
   },
   "repository": {
     "type": "git",
@@ -24,12 +24,15 @@
   "homepage": "https://github.com/lanetix/node-lanetix-amqp-easy",
   "devDependencies": {
     "eslint": "^0.11.0",
-    "eslint-plugin-nodeca": "^1.0.3"
+    "eslint-plugin-nodeca": "^1.0.3",
+    "mocha": "^2.1.0",
+    "should": "^4.5.0"
   },
   "dependencies": {
     "amqplib": "^0.3.0",
     "amqplib-retry": "^1.0.2",
     "bluebird": "^2.6.2",
-    "lodash.defaults": "^2.4.1"
+    "lodash.defaults": "^2.4.1",
+    "tape": "^3.0.3"
   }
 }

@@ -23,7 +23,7 @@ amqp.consume(
     topics: [ 'found.*' ]
   },
   function (cat) {
-    console.log('Found a cat named', cat.name);
+    console.log('Found a cat named', cat.json.name);
   }
 );
 
