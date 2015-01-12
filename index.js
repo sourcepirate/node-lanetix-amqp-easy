@@ -10,11 +10,14 @@ var defaults = require('lodash.defaults'),
 onDeath(function () {
   console.log('closing AMQP connections');
   BPromise.map(
-    connections,
-    function (connection, connectionUrl) {
-      return connection.close()
-        .then(function () {
-          console.log(connectionUrl, 'closed');
+    Object.keys(connections),
+    function (connectionUrl) {
+      return connections[connectionUrl]
+        .then(function (connection) {
+          return connection.close()
+          .then(function () {
+            console.log(connectionUrl, 'closed');
+          });
         });
     }
   )
