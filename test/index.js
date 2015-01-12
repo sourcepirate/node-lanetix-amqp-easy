@@ -2,11 +2,14 @@
 'use strict';
 
 var amqpUrl = 'amqp://guest:guest@localhost:5672',
+  childProcess = require('child_process'),
+  path = require('path'),
   BPromise = require('bluebird'),
   amqplib = require('amqplib'),
   amqp = require('../index')(amqpUrl);
 
 it('should publish, sendToQueue and receive', function (done) {
+  //TODO Don't directly use amqplib?
   amqplib.connect(amqpUrl)
     .then(function (connection) {
       //setup: teardown any existing data
@@ -61,4 +64,23 @@ it('should reuse the existing connection', function (done) {
         });
     })
     .catch(done);
+});
+
+it('should close the connection upon death', function (done) {
+  // Spin up a process to kill
+  var testProcess = childProcess.exec('node ' + path.join(__dirname, 'death.js')),
+      testStdOutput = testProcess.stdout;
+
+  // record stdout
+  testStdOutput.on('data', function (chunk) {
+    if (chunk === '1337-closed-it\n') {
+      done();
+    }
+  });
+
+  // need a delay to be sure the process is running
+  setTimeout(function () {
+    // kill the spun up process
+    childProcess.exec('kill -s 15 ' + testProcess.pid);
+  }, 200);
 });
