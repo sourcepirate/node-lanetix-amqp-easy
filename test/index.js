@@ -50,3 +50,15 @@ it('should publish, sendToQueue and receive', function (done) {
     })
     .catch(done);
 });
+
+it('should reuse the existing connection', function (done) {
+  amqp.connect()
+    .then(function (connection1) {
+      amqp.connect()
+        .then(function (connection2) {
+          connection1.should.equal(connection2);
+          done();
+        });
+    })
+    .catch(done);
+});
