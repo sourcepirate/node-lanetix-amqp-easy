@@ -75,6 +75,6 @@ it('should close the connection upon death', function (done) {
   // need a delay to be sure the process is running
   setTimeout(function () {
     // kill the spun up process
-    childProcess.exec('kill -s 15 ' + testProcess.pid);
+    process.kill(testProcess.pid, 'SIGTERM');
   }, 200);
 });
