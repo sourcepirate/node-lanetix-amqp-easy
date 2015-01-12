@@ -1,16 +1,13 @@
 /*globals it:false*/
 'use strict';
 
-var amqpUrl = 'amqp://guest:guest@localhost:5672',
-  childProcess = require('child_process'),
+var childProcess = require('child_process'),
   path = require('path'),
   BPromise = require('bluebird'),
-  amqplib = require('amqplib'),
-  amqp = require('../index')(amqpUrl);
+  amqp = require('../index')('amqp://guest:guest@localhost:5672');
 
 it('should publish, sendToQueue and receive', function (done) {
-  //TODO Don't directly use amqplib?
-  amqplib.connect(amqpUrl)
+  amqp.connect()
     .then(function (connection) {
       //setup: teardown any existing data
       return connection.createChannel()
@@ -22,9 +19,6 @@ it('should publish, sendToQueue and receive', function (done) {
             .then(function () {
               return channel.close();
             });
-        })
-        .then(function () {
-          return connection.close();
         });
     })
     .then(function () {
