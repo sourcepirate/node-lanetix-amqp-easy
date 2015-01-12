@@ -76,5 +76,5 @@ it('should close the connection upon death', function (done) {
   setTimeout(function () {
     // kill the spun up process
     process.kill(testProcess.pid, 'SIGTERM');
-  }, 200);
+  }, 500);
 });
