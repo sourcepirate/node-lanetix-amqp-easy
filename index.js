@@ -9,7 +9,7 @@ var defaults = require('lodash.defaults'),
 module.exports = function (amqpUrl) {
   function connect() {
     if (!connections[amqpUrl]) {
-      connections[amqpUrl] = amqp.connect(amqpUrl);
+      connections[amqpUrl] = BPromise.cast(amqp.connect(amqpUrl));
     }
     return connections[amqpUrl];
   }
@@ -34,10 +34,7 @@ module.exports = function (amqpUrl) {
       });
     }
 
-    return BPromise.resolve()
-      .then(function () {
-        return connect();
-      })
+    return connect()
       .then(function (conn) {
         return conn.createChannel();
       })
@@ -62,7 +59,7 @@ module.exports = function (amqpUrl) {
       })
       .then(function (ch) {
         if (options.retry) {
-          return ch.consume(options.queue, retry({
+          return [ch, ch.consume(options.queue, retry({
             channel: ch,
             consumerQueue: options.queue,
             failureQueue: options.retry.failQueue,
@@ -78,9 +75,9 @@ module.exports = function (amqpUrl) {
                   return handler(msg, ch);
                 });
             }
-          }));
+          }))];
         } else {
-          return ch.consume(options.queue, function (msg) {
+          return [ch, ch.consume(options.queue, function (msg) {
             if (!msg) { return; }
             return BPromise.resolve()
               .then(function () {
@@ -98,16 +95,18 @@ module.exports = function (amqpUrl) {
                 ch.nack(msg);
                 throw err;
               });
-          });
+          })];
         }
+      })
+      .spread(function (channel, consumerInfo) {
+        return function () {
+          return BPromise.cast(channel.cancel(consumerInfo.consumerTag));
+        };
       });
   }
 
   function publish(queueConfig, key, json, messageOptions) {
-    return BPromise.resolve()
-      .then(function () {
-        return connect();
-      })
+    return connect()
       .then(function (conn) {
         return conn.createChannel();
       })
@@ -132,10 +131,7 @@ module.exports = function (amqpUrl) {
   }
 
   function sendToQueue(queueConfig, json, messageOptions) {
-    return BPromise.resolve()
-      .then(function () {
-        return connect();
-      })
+    return connect()
       .then(function (conn) {
         // optional future =improvement - maybe we should keep the channel open?
         return conn.createChannel();
