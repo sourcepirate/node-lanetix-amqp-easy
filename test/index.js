@@ -12,7 +12,10 @@ beforeEach(function (done) {
         .then(function (channel) {
           channel.checkQueue('found_cats')
             .then(function () {
-              return channel.purgeQueue('found_cats');
+              return BPromise.all([
+                channel.deleteQueue('found_cats'),
+                channel.deleteQueue('found_cats.failure')
+              ]);
             })
             .catch(function () {
               //the queue doesn't exist, so w/e
@@ -53,12 +56,15 @@ describe('should publish, sendToQueue and receive', function () {
         } catch (err) { done(err); }
       }
     )
-      .then(function (c) { cancel = c; })
+      .then(function (c) {
+        cancel = c;
+        return BPromise.all([
+          amqp.publish({ exchange: 'cat' }, 'found.tawny', { name: 'Sally' }),
+          amqp.sendToQueue({ queue: 'found_cats' }, { name: 'Fred' })
+        ]);
+      })
       .catch(done);
 
-    amqp.publish({ exchange: 'cat' }, 'found.tawny', { name: 'Sally' });
-
-    amqp.sendToQueue({ queue: 'found_cats' }, { name: 'Fred' });
   });
 });
 
