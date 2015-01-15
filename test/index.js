@@ -10,7 +10,14 @@ beforeEach(function (done) {
     .then(function (connection) {
       connection.createChannel()
         .then(function (channel) {
-          channel.purgeQueue('found_cats');
+          channel.checkQueue('found_cats')
+            .then(function () {
+              return channel.purgeQueue('found_cats');
+            })
+            .catch(function () {
+              //the queue doesn't exist, so w/e
+              return;
+            });
         });
     })
     .nodeify(done);
