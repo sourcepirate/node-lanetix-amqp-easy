@@ -9,7 +9,7 @@ var defaults = require('lodash.defaults'),
 module.exports = function (amqpUrl) {
   function connect() {
     if (!connections[amqpUrl]) {
-      connections[amqpUrl] = BPromise.cast(amqp.connect(amqpUrl));
+      connections[amqpUrl] = BPromise.resolve(amqp.connect(amqpUrl));
     }
     return connections[amqpUrl];
   }
@@ -99,7 +99,7 @@ module.exports = function (amqpUrl) {
         })
         .then(function (consumerInfo) {
           return function () {
-            return BPromise.cast(ch.cancel(consumerInfo.consumerTag));
+            return BPromise.resolve(ch.cancel(consumerInfo.consumerTag));
           };
         });
       });
@@ -140,9 +140,11 @@ module.exports = function (amqpUrl) {
         return ch.assertQueue(queueConfig.queue,
             queueConfig.queueOptions || {durable: true})
           .then(function () {
-            return ch.sendToQueue(queueConfig.queue,
+            return ch.sendToQueue(
+              queueConfig.queue,
               new Buffer(JSON.stringify(json)),
-                messageOptions || queueConfig.messageOptions || {persistent: true});
+              messageOptions || queueConfig.messageOptions || {persistent: true}
+            );
           });
       });
   }
