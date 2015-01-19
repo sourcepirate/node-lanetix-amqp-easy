@@ -1,8 +1,8 @@
 - [`Create(amqpUrl)`](#createamqpurl---amqp)
-- [`AMQP.consume(config, handler)`](#amqp-consumeconfig-handler---cancellationpromise)
-- [`AMQP.publish(config, message)`](#amqp-publishconfig-handler---promise)
-- [`AMQP.sendToQueue(config, message)`](#amqp-sendtoqueueconfig-message---promise)
-- [`AMQP.connect()`](#amqp-connect---promise)
+- [`AMQP.consume(config, handler)`](#amqpconsumeconfig-handler---cancellationpromise)
+- [`AMQP.publish(config, key, message, [options])`](#amqppublishconfig-key-message-options---promise)
+- [`AMQP.sendToQueue(config, message, [options])`](#amqpsendtoqueueconfig-message-options---promise)
+- [`AMQP.connect()`](#amqpconnect---promise)
 - [`Config`](#config)
 
 ### `Create(amqpUrl)` -> `AMQP`
