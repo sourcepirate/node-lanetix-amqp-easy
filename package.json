@@ -17,7 +17,7 @@
     "easy"
   ],
   "author": "Mike Atkins",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/lanetix/node-lanetix-amqp-easy/issues"
   },
