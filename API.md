@@ -20,13 +20,15 @@ A `CancellationPromise` is returned. This promise resolves to a function which,
 when called, will cancel the consumer, preventing further messages from being
 received.
 
-### `AMQP.publish(config, message)` -> `Promise`
+### `AMQP.publish(config, key, message, [options])` -> `Promise`
 Asserts exchange specified in [`config`](#config). Then publishes `message` to
-that exchange.
+that exchange with routing key, `key` and `options` (if they exist) as in
+[amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_60).
 
-### `AMQP.sendToQueue(config, message)` -> `Promise`
+### `AMQP.sendToQueue(config, message, [options])` -> `Promise`
 Asserts queue specified in [`config`](#config). Then sends `message` to that
-queue.
+queue with `options` (if they exist) as in
+[amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_60).
 
 ### `AMQP.connect()` -> `Promise`
 Returns [`amqplib` connection]
@@ -41,8 +43,11 @@ Recognized properties follow
   Defaults to `{ durable: true }`
 - `exchangeType`: (string)
   [type](https://www.rabbitmq.com/tutorials/amqp-concepts.html#exchanges) of
-  the exchange
-- `prefetch`: (number) of messages to fetch when consuming
+  the exchange. Defaults to `'topic'`
+- `messageOptions`: (object) of options supported by
+  [amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_60).
+  Defaults to an empty object
+- `prefetch`: (number) of messages to fetch when consuming. Defaults to `1`
 - `queue`: (string) name of the queue to use
 - `queueOptions`: (object) of options supported by
   [amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_27).
