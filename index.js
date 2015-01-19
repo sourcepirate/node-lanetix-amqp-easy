@@ -9,7 +9,7 @@ var defaults = require('lodash.defaults'),
 module.exports = function (amqpUrl) {
   function connect() {
     if (!connections[amqpUrl]) {
-      connections[amqpUrl] = amqp.connect(amqpUrl);
+      connections[amqpUrl] = BPromise.resolve(amqp.connect(amqpUrl));
     }
     return connections[amqpUrl];
   }
@@ -34,14 +34,11 @@ module.exports = function (amqpUrl) {
       });
     }
 
-    return BPromise.resolve()
-      .then(function () {
-        return connect();
-      })
+    return connect()
       .then(function (conn) {
         return conn.createChannel();
       })
-      .tap(function (ch) {
+      .then(function (ch) {
         ch.prefetch(options.prefetch);
         return BPromise.all([
           options.exchange ?
@@ -51,22 +48,35 @@ module.exports = function (amqpUrl) {
             : BPromise.resolve(),
           ch.assertQueue(options.queue, options.queueOptions),
           options.retry && options.retry.failQueue ? ch.assertQueue(options.retry.failQueue, options.queueOptions) : true
-        ]);
-      })
-      .tap(function (ch) {
-        if (options.topics && options.topics.length) {
-          return BPromise.map(options.topics, function (topic) {
-            return ch.bindQueue(options.queue, options.exchange, topic);
-          });
-        }
-      })
-      .then(function (ch) {
-        if (options.retry) {
-          return ch.consume(options.queue, retry({
-            channel: ch,
-            consumerQueue: options.queue,
-            failureQueue: options.retry.failQueue,
-            handler: function (msg) {
+        ])
+        .then(function () {
+          if (options.topics && options.topics.length) {
+            return BPromise.map(options.topics, function (topic) {
+              return ch.bindQueue(options.queue, options.exchange, topic);
+            });
+          }
+        })
+        .then(function () {
+          if (options.retry) {
+            return ch.consume(options.queue, retry({
+              channel: ch,
+              consumerQueue: options.queue,
+              failureQueue: options.retry.failQueue,
+              handler: function (msg) {
+                if (!msg) { return; }
+                return BPromise.resolve()
+                  .then(function () {
+                    try {
+                      msg.json = JSON.parse(msg.content.toString());
+                    } catch (err) {
+                      console.error('Error converting AMQP message content to JSON.', err);
+                    }
+                    return handler(msg, ch);
+                  });
+              }
+            }));
+          } else {
+            return ch.consume(options.queue, function (msg) {
               if (!msg) { return; }
               return BPromise.resolve()
                 .then(function () {
@@ -76,38 +86,27 @@ module.exports = function (amqpUrl) {
                     console.error('Error converting AMQP message content to JSON.', err);
                   }
                   return handler(msg, ch);
+                })
+                .then(function () {
+                  return ch.ack(msg);
+                })
+                .catch(function (err) {
+                  ch.nack(msg);
+                  throw err;
                 });
-            }
-          }));
-        } else {
-          return ch.consume(options.queue, function (msg) {
-            if (!msg) { return; }
-            return BPromise.resolve()
-              .then(function () {
-                try {
-                  msg.json = JSON.parse(msg.content.toString());
-                } catch (err) {
-                  console.error('Error converting AMQP message content to JSON.', err);
-                }
-                return handler(msg, ch);
-              })
-              .then(function () {
-                return ch.ack(msg);
-              })
-              .catch(function (err) {
-                ch.nack(msg);
-                throw err;
-              });
-          });
-        }
+            });
+          }
+        })
+        .then(function (consumerInfo) {
+          return function () {
+            return BPromise.resolve(ch.cancel(consumerInfo.consumerTag));
+          };
+        });
       });
   }
 
   function publish(queueConfig, key, json, messageOptions) {
-    return BPromise.resolve()
-      .then(function () {
-        return connect();
-      })
+    return connect()
       .then(function (conn) {
         return conn.createChannel();
       })
@@ -132,22 +131,21 @@ module.exports = function (amqpUrl) {
   }
 
   function sendToQueue(queueConfig, json, messageOptions) {
-    return BPromise.resolve()
-      .then(function () {
-        return connect();
-      })
+    return connect()
       .then(function (conn) {
         // optional future =improvement - maybe we should keep the channel open?
         return conn.createChannel();
       })
-      .tap(function (ch) {
-        return ch.assertQueue(queueConfig.queue,
-            queueConfig.queueOptions || {durable: true});
-      })
       .then(function (ch) {
-        return ch.sendToQueue(queueConfig.queue,
-          new Buffer(JSON.stringify(json)),
-            messageOptions || queueConfig.messageOptions || {persistent: true});
+        return ch.assertQueue(queueConfig.queue,
+            queueConfig.queueOptions || {durable: true})
+          .then(function () {
+            return ch.sendToQueue(
+              queueConfig.queue,
+              new Buffer(JSON.stringify(json)),
+              messageOptions || queueConfig.messageOptions || {persistent: true}
+            );
+          });
       });
   }
 
