@@ -37,6 +37,8 @@ Found a cat named Sally
 Found a cat named Fred
 ```
 
+###[API](API.md)
+
 ###Logging
 All methods return a promise, so you can attach logging to them via the
 following.
