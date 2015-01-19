@@ -1,5 +1,6 @@
 amqplib-easy
 ============
+[![Build Status](https://travis-ci.org/lanetix/node-lanetix-amqp-easy.svg?branch=api-doc)](https://travis-ci.org/lanetix/node-lanetix-amqp-easy)
 
 [amqplib](https://github.com/squaremo/amqp.node) but easy! Let us manage your
 channels, connections, assertions and bindings for you, so you can just send
