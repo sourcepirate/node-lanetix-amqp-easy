@@ -17,7 +17,7 @@
     "easy"
   ],
   "author": "Mike Atkins",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/lanetix/node-lanetix-amqp-easy/issues"
   },
@@ -32,7 +32,6 @@
     "amqplib": "^0.3.0",
     "amqplib-retry": "^1.0.2",
     "bluebird": "^2.6.2",
-    "lodash.defaults": "^2.4.1",
-    "tape": "^3.0.3"
+    "lodash.defaults": "^2.4.1"
   }
 }

@@ -1,5 +1,6 @@
 amqplib-easy
 ============
+[![Build Status](https://travis-ci.org/lanetix/node-lanetix-amqp-easy.svg?branch=api-doc)](https://travis-ci.org/lanetix/node-lanetix-amqp-easy)
 
 [amqplib](https://github.com/squaremo/amqp.node) but easy! Let us manage your
 channels, connections, assertions and bindings for you, so you can just send
@@ -36,6 +37,8 @@ yields
 Found a cat named Sally
 Found a cat named Fred
 ```
+
+###[API](API.md)
 
 ###Logging
 All methods return a promise, so you can attach logging to them via the
