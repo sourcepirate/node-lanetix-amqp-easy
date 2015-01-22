@@ -1,6 +1,6 @@
 {
   "name": "amqplib-easy",
-  "version": "1.0.1",
+  "version": "2.1.0",
   "description": "Simplified API for interacting with AMQP",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "easy"
   ],
   "author": "Mike Atkins",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/lanetix/node-lanetix-amqp-easy/issues"
   },
