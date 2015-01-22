@@ -120,7 +120,7 @@ describe('Connection managment', function () {
 
   it('should close the connection upon death', function (done) {
     // Spin up a process to kill
-    var testProcess = childProcess.exec('node ' + path.join(__dirname, 'death.js')),
+    var testProcess = childProcess.exec('node ' + path.join(__dirname, 'resources/death.js')),
         testStdOutput = testProcess.stdout;
 
     // record stdout
