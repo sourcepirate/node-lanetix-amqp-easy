@@ -48,3 +48,14 @@ amqp.sendToQueue({ queue: 'found_cats' }, { name: 'Fred' })
   .then(function () { console.log('sent to queue'); })
   .catch(function (err) { console.error('sending failed', err); });
 ```
+
+###Connection Cleanup
+[diehard](https://www.npmjs.com/package/diehard) is used for cleaning up
+connections before the process exits. To ensure connections are cleaned up,
+```bash
+npm install --save diehard
+```
+and in your application's entry point, add
+```javascript
+require('diehard').listen();
+```
