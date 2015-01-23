@@ -4,7 +4,22 @@ var defaults = require('lodash.defaults'),
   BPromise = require('bluebird'),
   amqp = require('amqplib'),
   retry = require('amqplib-retry'),
+  diehard = require('diehard'),
   connections = {};
+
+function cleanup(done) {
+  BPromise.map(
+    Object.keys(connections),
+    function (connectionUrl) {
+      return connections[connectionUrl]
+        .then(function (connection) {
+          return connection.close();
+        });
+    }
+  ).nodeify(done);
+}
+
+diehard.register(cleanup);
 
 module.exports = function (amqpUrl) {
   function connect() {

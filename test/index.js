@@ -2,6 +2,7 @@
 'use strict';
 
 var amqpUrl = 'amqp://guest:guest@localhost:5672',
+  childProcess = require('child_process'),
   BPromise = require('bluebird'),
   amqp = require('../index')(amqpUrl);
 
@@ -99,5 +100,37 @@ describe('amqplib-easy', function () {
       })
       .nodeify(done);
 
+  });
+});
+
+describe('Connection managment', function () {
+
+  it('should reuse the existing connection', function (done) {
+    amqp.connect()
+      .then(function (connection1) {
+        amqp.connect()
+          .then(function (connection2) {
+            connection1.should.equal(connection2);
+            done();
+          });
+      })
+      .catch(done);
+  });
+
+  it('should close the connection upon death', function (done) {
+    this.timeout(3000);
+    // Spin up a process to kill
+    var testProcess = childProcess.fork('./test/resources/death.js', { silent: false });
+
+    testProcess.on('message', function (message) {
+      switch (message) {
+        case 'ok':
+          return done();
+        case 'ready':
+          return testProcess.kill('SIGTERM');
+        default:
+          return done(new Error('Unknown message ' + message));
+      }
+    });
   });
 });
