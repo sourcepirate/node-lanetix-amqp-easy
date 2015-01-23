@@ -3,7 +3,6 @@
 
 var amqpUrl = 'amqp://guest:guest@localhost:5672',
   childProcess = require('child_process'),
-  path = require('path'),
   BPromise = require('bluebird'),
   amqp = require('../index')(amqpUrl);
 
@@ -119,21 +118,19 @@ describe('Connection managment', function () {
   });
 
   it('should close the connection upon death', function (done) {
+    this.timeout(3000);
     // Spin up a process to kill
-    var testProcess = childProcess.exec('node ' + path.join(__dirname, 'resources/death.js')),
-        testStdOutput = testProcess.stdout;
+    var testProcess = childProcess.fork('./test/resources/death.js', { silent: false });
 
-    // record stdout
-    testStdOutput.on('data', function (chunk) {
-      if (chunk === '1337-closed-it\n') {
-        done();
+    testProcess.on('message', function (message) {
+      switch (message) {
+        case 'ok':
+          return done();
+        case 'ready':
+          return testProcess.kill('SIGTERM');
+        default:
+          return done(new Error('Unknown message ' + message));
       }
     });
-
-    // need a delay to be sure the process is running
-    setTimeout(function () {
-      // kill the spun up process
-      process.kill(testProcess.pid, 'SIGTERM');
-    }, 500);
   });
 });
