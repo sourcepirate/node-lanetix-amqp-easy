@@ -13,4 +13,4 @@ amqp.connect()
     process.send('ready');
   });
 
-diehard.listen();
+diehard.listen({timeout: 9000});
