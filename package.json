@@ -1,8 +1,13 @@
 {
   "name": "amqplib-easy",
-  "version": "2.2.3",
+  "version": "2.3.0",
   "description": "Simplified API for interacting with AMQP",
   "main": "index.js",
+  "engines": {
+    "iojs": ">=1.0 <1.6",
+    "node": ">=0.10 <0.13",
+    "npm": "^2"
+  },
   "scripts": {
     "lint": "eslint --ignore-path .gitignore .",
     "test": "npm run lint && mocha"
