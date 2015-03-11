@@ -72,7 +72,7 @@ module.exports = function (amqpUrl) {
           })
           .then(function () {
             function parse(msg) {
-              return function() {
+              return function () {
                 try {
                   msg.json = JSON.parse(msg.content.toString());
                   return handler(msg, ch);
