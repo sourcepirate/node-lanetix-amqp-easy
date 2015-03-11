@@ -71,6 +71,16 @@ module.exports = function (amqpUrl) {
             }
           })
           .then(function () {
+            function parse(msg) {
+              return function() {
+                try {
+                  msg.json = JSON.parse(msg.content.toString());
+                  return handler(msg, ch);
+                } catch (err) {
+                  console.error('Error converting AMQP message content to JSON.', err);
+                }
+              };
+            }
             if (options.retry) {
               return ch.consume(options.queue, retry({
                 channel: ch,
@@ -79,28 +89,14 @@ module.exports = function (amqpUrl) {
                 handler: function (msg) {
                   if (!msg) { return; }
                   return BPromise.resolve()
-                    .then(function () {
-                      try {
-                        msg.json = JSON.parse(msg.content.toString());
-                      } catch (err) {
-                        console.error('Error converting AMQP message content to JSON.', err);
-                      }
-                      return handler(msg, ch);
-                    });
+                    .then(parse(msg));
                 }
               }));
             } else {
               return ch.consume(options.queue, function (msg) {
                 if (!msg) { return; }
                 return BPromise.resolve()
-                  .then(function () {
-                    try {
-                      msg.json = JSON.parse(msg.content.toString());
-                    } catch (err) {
-                      console.error('Error converting AMQP message content to JSON.', err);
-                    }
-                    return handler(msg, ch);
-                  })
+                  .then(parse(msg))
                   .then(function () {
                     return ch.ack(msg);
                   })
