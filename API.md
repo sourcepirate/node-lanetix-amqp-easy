@@ -24,11 +24,15 @@ received.
 Asserts exchange specified in [`config`](#config). Then publishes `message` to
 that exchange with routing key, `key` and `options` (if they exist) as in
 [amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_60).
+If message is a `Buffer`, it is sent as is, otherwise, it is serialized to JSON
+and sent.
 
 ### `AMQP.sendToQueue(config, message, [options])` -> `Promise`
 Asserts queue specified in [`config`](#config). Then sends `message` to that
 queue with `options` (if they exist) as in
 [amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_60).
+If message is a `Buffer`, it is sent as is, otherwise, it is serialized to JSON
+and sent.
 
 ### `AMQP.connect()` -> `Promise`
 Returns [`amqplib` connection]

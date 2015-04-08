@@ -31,7 +31,7 @@ describe('amqplib-easy', function () {
       });
   });
 
-  describe('should publish, sendToQueue and receive', function () {
+  describe('', function () {
     var cancel;
 
     afterEach(function () {
@@ -40,7 +40,37 @@ describe('amqplib-easy', function () {
       }
     });
 
-    it('', function (done) {
+    it('should handle buffers reasonably', function (done) {
+      var catCount = 0;
+      amqp.consume(
+        {
+          exchange: 'cat',
+          queue: 'found_cats',
+          topics: [ 'found.*' ]
+        },
+        function (cat) {
+          var name = cat.json.name;
+          try {
+            /*eslint-disable no-unused-expressions*/
+            (name === 'Sally' || name === 'Fred').should.be.ok;
+            /*eslint-enable no-unused-expressions*/
+            if (++catCount === 2) {
+              done();
+            }
+          } catch (err) { done(err); }
+        }
+      )
+        .then(function (c) {
+          cancel = c;
+          return BPromise.all([
+            amqp.publish({ exchange: 'cat' }, 'found.tawny', new Buffer('{ "name": "Sally" }')),
+            amqp.sendToQueue({ queue: 'found_cats' }, new Buffer('{ "name": "Fred" }'))
+          ]);
+        })
+        .catch(done);
+    });
+
+    it('should publish, sendToQueue and receive', function (done) {
       var catCount = 0;
       amqp.consume(
         {

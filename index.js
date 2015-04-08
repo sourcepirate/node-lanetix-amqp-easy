@@ -19,6 +19,13 @@ function cleanup(done) {
   ).nodeify(done);
 }
 
+function toBuffer(obj) {
+  if (obj instanceof Buffer) {
+    return obj;
+  }
+  return new Buffer(JSON.stringify(obj));
+}
+
 diehard.register(cleanup);
 
 module.exports = function (amqpUrl) {
@@ -132,7 +139,7 @@ module.exports = function (amqpUrl) {
       .then(function (ch) {
         return ch.publish(queueConfig.exchange,
           key,
-          new Buffer(JSON.stringify(json)),
+          toBuffer(json),
           messageOptions || queueConfig.messageOptions || {persistent: true});
       });
   }
@@ -148,7 +155,7 @@ module.exports = function (amqpUrl) {
           .then(function () {
             return ch.sendToQueue(
               queueConfig.queue,
-              new Buffer(JSON.stringify(json)),
+              toBuffer(json),
               messageOptions || queueConfig.messageOptions || {persistent: true}
             );
           });
