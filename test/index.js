@@ -40,6 +40,31 @@ describe('amqplib-easy', function () {
       }
     });
 
+    it('should accept alternate parser', function (done) {
+      amqp.consume(
+        {
+          exchange: 'cat',
+          parse: function () { return { name: 'Fred' }; },
+          queue: 'found_cats',
+          topics: [ 'found.*' ]
+        },
+        function (cat) {
+          var name = cat.json.name;
+          try {
+            name.should.equal('Fred');
+            done();
+          } catch (err) { done(err); }
+        }
+      )
+        .then(function (c) {
+          cancel = c;
+          return BPromise.all([
+            amqp.sendToQueue({ queue: 'found_cats' }, new Buffer('dsadasd'))
+          ]);
+        })
+        .catch(done);
+    });
+
     it('should handle buffers reasonably', function (done) {
       var catCount = 0;
       amqp.consume(

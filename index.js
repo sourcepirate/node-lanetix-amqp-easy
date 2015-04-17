@@ -40,6 +40,7 @@ module.exports = function (amqpUrl) {
     var options = defaults({}, queueConfig || {}, {
       exchangeType: 'topic',
       exchangeOptions: {durable: true},
+      parse: JSON.parse,
       queueOptions: {durable: true},
       prefetch: 1
     });
@@ -81,10 +82,10 @@ module.exports = function (amqpUrl) {
             function parse(msg) {
               return function () {
                 try {
-                  msg.json = JSON.parse(msg.content.toString());
+                  msg.json = options.parse(msg.content.toString());
                   return handler(msg, ch);
                 } catch (err) {
-                  console.error('Error converting AMQP message content to JSON.', err);
+                  console.error('Error deserializing AMQP message content.', err);
                 }
               };
             }
