@@ -36,6 +36,19 @@ module.exports = function (amqpUrl) {
     return connections[amqpUrl];
   }
 
+  function createChannel() {
+    return connect().then(function (connection) {
+      return BPromise.resolve(connection.createChannel());
+    });
+  }
+
+  function createChannelDisposer() {
+    return createChannel()
+      .disposer(function (channel) {
+        return channel.close();
+      });
+  }
+
   function consume(queueConfig, handler) {
     var options = defaults({}, queueConfig || {}, {
       exchangeType: 'topic',
@@ -57,10 +70,7 @@ module.exports = function (amqpUrl) {
       });
     }
 
-    return connect()
-      .then(function (conn) {
-        return conn.createChannel();
-      })
+    return createChannel()
       .then(function (ch) {
         ch.prefetch(options.prefetch);
         return BPromise.resolve()
@@ -124,34 +134,30 @@ module.exports = function (amqpUrl) {
   }
 
   function publish(queueConfig, key, json, messageOptions) {
-    return connect()
-      .then(function (conn) {
-        return conn.createChannel();
-      })
-      .tap(function (ch) {
+    return BPromise.using(
+      createChannelDisposer(),
+      function (ch) {
         if (queueConfig.exchange === null || queueConfig.exchange === undefined) {
           throw new Error('Client tries to publish to an exchange while exchange name is not undefined.');
         }
         return BPromise.all([
           ch.assertExchange(queueConfig.exchange, queueConfig.exchangeType || 'topic', queueConfig.exchangeOptions || {durable: true}),
           queueConfig.queue ? ch.assertQueue(queueConfig.queue, queueConfig.queueOptions || {durable: true}) : BPromise.resolve()
-        ]);
-      })
-      .then(function (ch) {
-        return ch.publish(queueConfig.exchange,
-          key,
-          toBuffer(json),
-          messageOptions || queueConfig.messageOptions || {persistent: true});
-      });
+        ])
+          .then(function () {
+            return ch.publish(queueConfig.exchange,
+              key,
+              toBuffer(json),
+              messageOptions || queueConfig.messageOptions || {persistent: true});
+          });
+      }
+    );
   }
 
   function sendToQueue(queueConfig, json, messageOptions) {
-    return connect()
-      .then(function (conn) {
-        // optional future =improvement - maybe we should keep the channel open?
-        return conn.createChannel();
-      })
-      .then(function (ch) {
+    return BPromise.using(
+      createChannelDisposer(),
+      function (ch) {
         return ch.assertQueue(queueConfig.queue, queueConfig.queueOptions || {durable: true})
           .then(function () {
             return ch.sendToQueue(
@@ -160,7 +166,8 @@ module.exports = function (amqpUrl) {
               messageOptions || queueConfig.messageOptions || {persistent: true}
             );
           });
-      });
+      }
+    );
   }
 
   return {
