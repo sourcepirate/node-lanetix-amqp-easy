@@ -53,6 +53,7 @@ Recognized properties follow
   Defaults to an empty object
 - `parse`: (function) parse string content of message. Defaults to `JSON.parse`
 - `prefetch`: (number) of messages to fetch when consuming. Defaults to `1`
+- `arguments`: (object) containing any binding arguments for the queue. Defaults to `{}`
 - `queue`: (string) name of the queue to use
 - `queueOptions`: (object) of options supported by
   [amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_27).
