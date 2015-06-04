@@ -55,7 +55,8 @@ module.exports = function (amqpUrl) {
       exchangeOptions: {durable: true},
       parse: JSON.parse,
       queueOptions: {durable: true},
-      prefetch: 1
+      prefetch: 1,
+      arguments: {}
     });
 
     // automatically enable retry unless it is specifically disabled
@@ -84,7 +85,7 @@ module.exports = function (amqpUrl) {
           .then(function () {
             if (options.topics && options.topics.length) {
               return BPromise.map(options.topics, function (topic) {
-                return ch.bindQueue(options.queue, options.exchange, topic);
+                return ch.bindQueue(options.queue, options.exchange, topic, options.arguments);
               });
             }
           })
