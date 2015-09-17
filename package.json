@@ -1,6 +1,6 @@
 {
   "name": "amqplib-easy",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Simplified API for interacting with AMQP",
   "main": "index.js",
   "scripts": {
