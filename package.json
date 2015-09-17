@@ -29,7 +29,7 @@
     "should": "^4.5.0"
   },
   "dependencies": {
-    "amqplib": "^0.3.0",
+    "amqplib": "^0.4.0",
     "amqplib-retry": "^1.0.2",
     "bluebird": "^2.6.2",
     "diehard": "^1.3.0",
