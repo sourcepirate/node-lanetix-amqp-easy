@@ -29,10 +29,13 @@ function toBuffer(obj) {
 
 diehard.register(cleanup);
 
-module.exports = function (amqpUrl) {
+module.exports = function (amqpUrl, socketOptions) {
   function connect() {
     if (!connections[amqpUrl]) {
-      connections[amqpUrl] = BPromise.resolve(amqp.connect(amqpUrl));
+      socketOptions = defaults({}, socketOptions || {}, {
+        channelMax: 100
+      });
+      connections[amqpUrl] = BPromise.resolve(amqp.connect(amqpUrl, socketOptions));
     }
     return connections[amqpUrl];
   }
