@@ -1,15 +1,18 @@
-- [`Create(amqpUrl)`](#createamqpurl---amqp)
+- [`Create(amqpUrl)`](#createamqpurl-socketoptions---amqp)
 - [`AMQP.consume(config, handler)`](#amqpconsumeconfig-handler---cancellationpromise)
 - [`AMQP.publish(config, key, message, [options])`](#amqppublishconfig-key-message-options---promise)
 - [`AMQP.sendToQueue(config, message, [options])`](#amqpsendtoqueueconfig-message-options---promise)
 - [`AMQP.connect()`](#amqpconnect---promise)
 - [`Config`](#config)
 
-### `Create(amqpUrl)` -> `AMQP`
+### `Create(amqpUrl, [socketOptions])` -> `AMQP`
 Create an `AMQP` which connects to `amqpUrl`. E.g.,
 ```javascript
 var amqp = require('amqplib-easy')('amqp://guest:guest@localhost');
 ```
+
+[`socketOptions`](http://www.squaremobius.net/amqp.node/channel_api.html#connect)
+default to `maxChannels: 100`.
 
 ### `AMQP.consume(config, handler)` -> `CancellationPromise`
 Asserts queue and exchange specified in [`config`](#config) and binds them
