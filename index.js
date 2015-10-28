@@ -5,7 +5,8 @@ var defaults = require('lodash.defaults'),
   amqp = require('amqplib'),
   retry = require('amqplib-retry'),
   diehard = require('diehard'),
-  connections = {};
+  connections = {},
+  sendChannels = {};
 
 function cleanup(done) {
   BPromise.map(
@@ -36,17 +37,27 @@ module.exports = function (amqpUrl) {
     return connections[amqpUrl];
   }
 
+  function sendChannel() {
+    if (!sendChannels[amqpUrl]) {
+      sendChannels[amqpUrl] = connect()
+        .then(function (connection) {
+          return connection.createConfirmChannel()
+            .then(function (channel) {
+              channel.on('error', function () {
+                sendChannels[amqpUrl] = null;
+                // clear out the channel since it's in a bad state
+              });
+              return channel;
+            });
+        });
+    }
+    return sendChannels[amqpUrl];
+  }
+
   function createChannel() {
     return connect().then(function (connection) {
       return BPromise.resolve(connection.createChannel());
     });
-  }
-
-  function createChannelDisposer() {
-    return createChannel()
-      .disposer(function (channel) {
-        return channel.close();
-      });
   }
 
   function consume(queueConfig, handler) {
@@ -135,9 +146,8 @@ module.exports = function (amqpUrl) {
   }
 
   function publish(queueConfig, key, json, messageOptions) {
-    return BPromise.using(
-      createChannelDisposer(),
-      function (ch) {
+    return sendChannel()
+      .then(function (ch) {
         if (queueConfig.exchange === null || queueConfig.exchange === undefined) {
           throw new Error('Client tries to publish to an exchange while exchange name is not undefined.');
         }
@@ -146,26 +156,44 @@ module.exports = function (amqpUrl) {
           queueConfig.queue ? ch.assertQueue(queueConfig.queue, queueConfig.queueOptions || {durable: true}) : BPromise.resolve()
         ])
           .then(function () {
-            return ch.publish(queueConfig.exchange,
-              key,
-              toBuffer(json),
-              messageOptions || queueConfig.messageOptions || {persistent: true});
+            return new BPromise(function (resolve, reject) {
+              ch.publish(queueConfig.exchange,
+                key,
+                toBuffer(json),
+                messageOptions || queueConfig.messageOptions || {persistent: true},
+                function (err) {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve();
+                  }
+                }
+              );
+            });
           });
       }
     );
   }
 
   function sendToQueue(queueConfig, json, messageOptions) {
-    return BPromise.using(
-      createChannelDisposer(),
-      function (ch) {
+    return sendChannel()
+      .then(function (ch) {
         return ch.assertQueue(queueConfig.queue, queueConfig.queueOptions || {durable: true})
           .then(function () {
-            return ch.sendToQueue(
-              queueConfig.queue,
-              toBuffer(json),
-              messageOptions || queueConfig.messageOptions || {persistent: true}
-            );
+            return new BPromise(function (resolve, reject) {
+              ch.sendToQueue(
+                queueConfig.queue,
+                toBuffer(json),
+                messageOptions || queueConfig.messageOptions || {persistent: true},
+                function (err) {
+                  if (err) {
+                    reject(err);
+                  } else {
+                    resolve();
+                  }
+                }
+              );
+            });
           });
       }
     );

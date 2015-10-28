@@ -31,7 +31,7 @@ describe('amqplib-easy', function () {
       });
   });
 
-  describe('', function () {
+  describe('consumer', function () {
     var cancel;
 
     afterEach(function () {
@@ -124,6 +124,27 @@ describe('amqplib-easy', function () {
         })
         .catch(done);
 
+    });
+
+    it('should publish even if something causes the channel to die', function (done) {
+      amqp.consume(
+        {
+          exchange: 'cat',
+          queue: 'found_cats',
+          topics: [ 'found.*' ]
+        },
+        function () {
+          done();
+        }
+      )
+        .then(function (c) {
+          cancel = c;
+          return amqp.publish({ exchange: 'cat', exchangeType: 'direct' }, 'found.tawny', { name: 'Sally' })
+            .catch(function () {
+              return amqp.publish({ exchange: 'cat', exchangeType: 'topic' }, 'found.tawny', { name: 'Sally' });
+            });
+        })
+        .catch(done);
     });
   });
 
