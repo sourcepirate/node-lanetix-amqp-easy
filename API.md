@@ -61,6 +61,8 @@ Recognized properties follow
 - `queueOptions`: (object) of options supported by
   [amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_27).
   Defaults to `{ durable: true }`
+- `topics`: (array of strings) topics to bind to the queue from the exchange.
+  Only for `topic` exchanges.
 - `retry`: (boolean or object) if false, disable retry via
   [amqplib-retry](https://www.npmjs.com/package/amqplib-retry). An object with
   `failQueue` can also be specified to override the fail queue. Defaults to
