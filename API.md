@@ -26,40 +26,40 @@ received.
 ### `AMQP.publish(config, key, message, [options])` -> `Promise`
 Asserts exchange specified in [`config`](#config). Then publishes `message` to
 that exchange with routing key, `key` and `options` (if they exist) as in
-[amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_60).
+[amqplib](http://www.squaremobius.net/amqp.node/channel_api.html#channel_publish).
 If message is a `Buffer`, it is sent as is, otherwise, it is serialized to JSON
 and sent.
 
 ### `AMQP.sendToQueue(config, message, [options])` -> `Promise`
 Asserts queue specified in [`config`](#config). Then sends `message` to that
 queue with `options` (if they exist) as in
-[amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_60).
+[amqplib](http://www.squaremobius.net/amqp.node/channel_api.html#channel_sendToQueue).
 If message is a `Buffer`, it is sent as is, otherwise, it is serialized to JSON
 and sent.
 
 ### `AMQP.connect()` -> `Promise`
 Returns [`amqplib` connection]
-(http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_11)
+(http://www.squaremobius.net/amqp.node/channel_api.html#models)
 for handling use cases not covered by this library, e.g., deleting queues.
 
 ### `Config`
 Recognized properties follow
 - `exchange`: (string) name of the exchange to be used
 - `exchangeOptions`: (object) of options supported by
-  [amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_45).
+  [amqplib](http://www.squaremobius.net/amqp.node/channel_api.html#channel_assertExchange).
   Defaults to `{ durable: true }`
 - `exchangeType`: (string)
   [type](https://www.rabbitmq.com/tutorials/amqp-concepts.html#exchanges) of
   the exchange. Defaults to `'topic'`
 - `messageOptions`: (object) of options supported by
-  [amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_60).
+  [amqplib](http://www.squaremobius.net/amqp.node/channel_api.html#channel_publish).
   Defaults to an empty object
 - `parse`: (function) parse string content of message. Defaults to `JSON.parse`
 - `prefetch`: (number) of messages to fetch when consuming. Defaults to `1`
 - `arguments`: (object) containing any binding arguments for the queue. Defaults to `{}`
 - `queue`: (string) name of the queue to use
 - `queueOptions`: (object) of options supported by
-  [amqplib](http://www.squaremobius.net/amqp.node/doc/channel_api.html#toc_27).
+  [amqplib](http://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue).
   Defaults to `{ durable: true }`
 - `topics`: (array of strings) topics to bind to the queue from the exchange.
   Only for `topic` exchanges.
