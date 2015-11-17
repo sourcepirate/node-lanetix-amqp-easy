@@ -22,8 +22,7 @@ describe('amqplib-easy', function () {
                   return channel.deleteQueue('found_cats.failure');
                 })
             ])
-              .catch(function (err) {
-                console.log('boom', err);
+              .catch(function () {
                 //the queue doesn't exist, so w/e
                 return;
               });
@@ -146,7 +145,56 @@ describe('amqplib-easy', function () {
         })
         .catch(done);
     });
+
+    describe('fanout exchange', function () {
+
+      function deleteCat() {
+        return amqp.connect()
+          .then(function (connection) {
+            return connection.createChannel()
+              .then(function (channel) {
+                channel.checkExchange('cat')
+                .then(
+                  function () {
+                    channel.deleteExchange('cat');
+                  },
+                  function () { /* NBD it doesn't exist */ }
+                );
+              });
+          });
+      }
+
+      beforeEach(deleteCat);
+      afterEach(deleteCat);
+
+      it('should publish via fanout', function (done) {
+        amqp.consume(
+          {
+            exchange: 'cat',
+            exchangeType: 'fanout',
+            queue: 'found_cats'
+          },
+          function (cat) {
+            var name = cat.json.name;
+            try {
+              name.should.equal('Sally');
+              done();
+            } catch (err) { done(err); }
+          }
+        )
+          .then(function (c) {
+            cancel = c;
+            return amqp.publish(
+              { exchange: 'cat', exchangeType: 'fanout' },
+              'found.tawny',
+              { name: 'Sally' }
+            );
+          })
+          .catch(done);
+      });
+    });
   });
+
 
   it('should cancel consumer', function (done) {
 
