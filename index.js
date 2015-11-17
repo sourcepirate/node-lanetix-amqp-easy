@@ -101,6 +101,8 @@ module.exports = function (amqpUrl, socketOptions) {
               return BPromise.map(options.topics, function (topic) {
                 return ch.bindQueue(options.queue, options.exchange, topic, options.arguments);
               });
+            } else if (options.exchangeType === 'fanout') {
+              return ch.bindQueue(options.queue, options.exchange, '', options.arguments);
             }
           })
           .then(function () {
