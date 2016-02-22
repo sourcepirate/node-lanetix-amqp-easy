@@ -50,6 +50,7 @@ amqp.sendToQueue({ queue: 'found_cats' }, { name: 'Fred' })
 ```
 
 ###Connection Cleanup
+
 [diehard](https://www.npmjs.com/package/diehard) is used for cleaning up
 connections before the process exits. To ensure connections are cleaned up,
 ```bash
@@ -59,3 +60,5 @@ and in your application's entry point, add
 ```javascript
 require('diehard').listen();
 ```
+
+You can also explicitly close all connections by calling `require('amqplib-easy').close()`. You may pass a callback to this function which will be invoked once all connections have been closed.

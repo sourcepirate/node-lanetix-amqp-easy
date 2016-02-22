@@ -211,3 +211,5 @@ module.exports = function (amqpUrl, socketOptions) {
     sendToQueue: sendToQueue
   };
 };
+
+module.exports.close = cleanup;
