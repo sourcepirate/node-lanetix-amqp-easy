@@ -1,11 +1,23 @@
 {
   "name": "amqplib-easy",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "Simplified API for interacting with AMQP",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint --ignore-path .gitignore .",
+    "lint": "standard",
     "test": "npm run lint && mocha"
+  },
+  "standard": {
+    "globals": [
+      "describe",
+      "context",
+      "before",
+      "beforeEach",
+      "after",
+      "afterEach",
+      "it",
+      "expect"
+    ]
   },
   "repository": {
     "type": "git",
@@ -23,10 +35,9 @@
   },
   "homepage": "https://github.com/lanetix/node-lanetix-amqp-easy",
   "devDependencies": {
-    "eslint": "^0.11.0",
-    "eslint-plugin-nodeca": "^1.0.3",
     "mocha": "^2.1.0",
-    "should": "^4.5.0"
+    "should": "^8.2.2",
+    "standard": "^6"
   },
   "dependencies": {
     "amqplib": "^0.4.0",
