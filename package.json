@@ -4,7 +4,7 @@
   "description": "Simplified API for interacting with AMQP",
   "main": "index.js",
   "scripts": {
-    "lint": "./node_modules/.bin/standard",
+    "lint": "standard",
     "test": "npm run lint && mocha"
   },
   "standard": {
