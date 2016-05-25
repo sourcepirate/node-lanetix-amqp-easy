@@ -64,6 +64,6 @@ Recognized properties follow
 - `topics`: (array of strings) topics to bind to the queue from the exchange.
   Only for `topic` exchanges.
 - `retry`: (boolean or object) if false, disable retry via
-  [amqplib-retry](https://www.npmjs.com/package/amqplib-retry). An object with
-  `failQueue` can also be specified to override the fail queue. Defaults to
-  true.
+  [amqplib-retry](https://www.npmjs.com/package/amqplib-retry). Defaults to true, but an object with properties that follow may be specified to customize the behavior of the retry.
+  -  `failQueue` can also be specified to override the name of the queue used to hold failed messages.
+  -  `delay` a function which accepts the number of attempts as an argument and returns a number of milliseconds to indicate how long to wait before retrying. If `-1` is returned, the message will be put into the failure queue.
