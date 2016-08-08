@@ -126,6 +126,7 @@ module.exports = function (amqpUrl, socketOptions) {
                 channel: ch,
                 consumerQueue: options.queue,
                 failureQueue: options.retry.failQueue,
+                delay: options.retry.delay,
                 handler: function (msg) {
                   if (!msg) {
                     return
