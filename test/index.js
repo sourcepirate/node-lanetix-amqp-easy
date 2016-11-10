@@ -156,10 +156,10 @@ describe('amqplib-easy', function () {
           .then(function (connection) {
             return connection.createChannel()
               .then(function (channel) {
-                channel.checkExchange('cat')
+                return channel.checkExchange('cat')
                   .then(
                     function () {
-                      channel.deleteExchange('cat')
+                      return channel.deleteExchange('cat')
                     },
                     function () { /* NBD it doesn't exist */
                     }
