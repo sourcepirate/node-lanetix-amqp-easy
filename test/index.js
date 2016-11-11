@@ -156,10 +156,10 @@ describe('amqplib-easy', function () {
           .then(function (connection) {
             return connection.createChannel()
               .then(function (channel) {
-                channel.checkExchange('cat')
+                return channel.checkExchange('cat')
                   .then(
                     function () {
-                      channel.deleteExchange('cat')
+                      return channel.deleteExchange('cat')
                     },
                     function () { /* NBD it doesn't exist */
                     }
@@ -257,6 +257,97 @@ describe('Connection managment', function () {
         default:
           return done(new Error('Unknown message ' + message))
       }
+    })
+  })
+})
+
+describe('x-delayed-message', function () {
+  var plugin = false
+
+  after(function () {
+    if (!plugin) return
+
+    return amqp.connect()
+      .then(function (connection) {
+        return BPromise.resolve(connection.createChannel())
+          .then(function (channel) {
+            return BPromise.all(
+              [
+                channel.checkExchange('cat')
+                  .then(function () {
+                    channel.deleteExchange('cat')
+                  }),
+                channel.checkQueue('found_cats')
+                  .then(function () {
+                    channel.deleteQueue('found_cats')
+                  }),
+                channel.checkQueue('found_cats.failure')
+                  .then(function () {
+                    channel.deleteQueue('found_cats.failure')
+                  })
+              ])
+              .catch(function () {
+                // the queue doesn't exist, so w/e
+                return
+              })
+          })
+      })
+  })
+
+  it('should installed rabbitmq delayed message plugin', function (done) {
+    amqp.connect()
+      .then(function (connection) {
+        connection.on('error', function () {})
+        return BPromise.resolve(connection.createChannel())
+          .then(function (channel) {
+            return channel.assertExchange('cat', 'x-delayed-message', {arguments: {'x-delayed-type': 'fanout'}})
+          })
+          .then(function () {
+            return BPromise.resolve(connection.createChannel())
+              .then(function (channel) {
+                plugin = true
+                return channel.deleteExchange('cat')
+              })
+          })
+      })
+      .catch(function () {})
+      .finally(function () {
+        done()
+      })
+  })
+
+  it('should publish delayed message of 3 sec via fanout', function (done) {
+    if (!plugin) {
+      this.skip()
+    }
+
+    this.timeout(6000)
+    amqp
+    .consume({
+      exchange: 'cat',
+      exchangeType: 'x-delayed-message',
+      exchangeOptions: {arguments: {'x-delayed-type': 'fanout'}},
+      queue: 'found_cats'
+    }, function (cat) {
+      var name = cat.json.name
+      // There may be some delay, use 2.9 sec to test
+      var time = cat.json.time + 2900
+
+      try {
+        name.should.equal('Sally')
+        time.should.be.below(new Date().getTime())
+        done()
+      } catch (err) {
+        done(err)
+      }
+    })
+    .then(function () {
+      return amqp.publish(
+        {exchange: 'cat', exchangeType: 'x-delayed-message'},
+        'found.tawny',
+        {name: 'Sally', time: new Date().getTime()},
+        {headers: {'x-delay': 3000}}
+      )
     })
   })
 })
