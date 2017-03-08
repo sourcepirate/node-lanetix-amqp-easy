@@ -217,8 +217,7 @@ describe('amqplib-easy', function () {
               })
           })
       }
-
-      // beforeEach(deleteCat)
+      
       afterEach(deleteCat)
 
       it('should publish via headers', function (done) {
