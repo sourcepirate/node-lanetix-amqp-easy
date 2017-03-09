@@ -1,4 +1,4 @@
-/*globals it:false*/
+/* globals it:false */
 'use strict'
 
 var amqpUrl = 'amqp://guest:guest@localhost:5672'
@@ -194,6 +194,59 @@ describe('amqplib-easy', function () {
               {exchange: 'cat', exchangeType: 'fanout'},
               'found.tawny',
               {name: 'Sally'}
+            )
+          })
+          .catch(done)
+      })
+    })
+
+    describe('headers exchange', function () {
+      function deleteCat () {
+        return amqp.connect()
+          .then(function (connection) {
+            return connection.createChannel()
+              .then(function (channel) {
+                return channel.checkExchange('cat')
+                  .then(
+                    function () {
+                      return channel.deleteExchange('cat')
+                    },
+                    function () { /* NBD it doesn't exist */
+                    }
+                )
+              })
+          })
+      }
+
+      afterEach(deleteCat)
+
+      it('should publish via headers', function (done) {
+        amqp.consume(
+          {
+            exchange: 'cat',
+            exchangeType: 'headers',
+            arguments: {
+              'color': 'blue'
+            },
+            queue: 'found_cats'
+          },
+          function (cat) {
+            var name = cat.json.name
+            try {
+              name.should.equal('Sally')
+              done()
+            } catch (err) {
+              done(err)
+            }
+          }
+        )
+          .then(function (c) {
+            cancel = c
+            return amqp.publish(
+              {exchange: 'cat', exchangeType: 'headers'},
+              'found.tawny',
+              {name: 'Sally'},
+              {headers: {color: 'blue'}}
             )
           })
           .catch(done)

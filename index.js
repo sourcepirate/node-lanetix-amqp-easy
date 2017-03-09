@@ -101,13 +101,13 @@ module.exports = function (amqpUrl, socketOptions) {
             ])
           })
           .then(function () {
-            if ((options.topics && options.topics.length) || (options.exchangeType === 'x-delayed-message' && options.exchangeOptions.arguments['x-delayed-type'] === 'topic')) {
-              return Promise.map(options.topics, function (topic) {
-                return ch.bindQueue(options.queue, options.exchange, topic, options.arguments)
-              })
-            } else if (options.exchangeType === 'fanout' || (options.exchangeType === 'x-delayed-message' && options.exchangeOptions.arguments['x-delayed-type'] === 'fanout')) {
-              return ch.bindQueue(options.queue, options.exchange, '', options.arguments)
+            if (!options.topics || !options.topics.length) {
+              options.topics = ['']
             }
+
+            return Promise.map(options.topics, function (topic) {
+              return ch.bindQueue(options.queue, options.exchange, topic, options.arguments || {})
+            })
           })
           .then(function () {
             function parse (msg) {
