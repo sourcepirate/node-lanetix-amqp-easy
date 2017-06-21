@@ -15,7 +15,7 @@ function cleanup (done) {
       return connections[connectionUrl]
         .then(function (connection) {
           return connection.close()
-        })
+        }).catch(function () {})
     })
     .then(function () {
       connections = {}
