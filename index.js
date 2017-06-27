@@ -16,8 +16,8 @@ function cleanup (done) {
         .then(function (connection) {
           return connection.close()
         }).catch(function (err) {
-          // this catch is necessary that all connections get closed – even if
-          // there are not established – without affection others.
+          // this catch is necessary so that all single connections get closed and
+          // cleared, even if they are not established, without affection others.
           console.warn(err.toString())
         })
     })
