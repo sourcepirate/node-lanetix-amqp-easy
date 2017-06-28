@@ -42,7 +42,7 @@ Returns [`amqplib` connection]
 (http://www.squaremobius.net/amqp.node/channel_api.html#models)
 for handling use cases not covered by this library, e.g., deleting queues.
 
-### `AMQP.close()` --> `Promise`
+### `AMQP.close()` -> `Promise`
 Close the `AMQP` and delete its `connection` & `sendChannel` without affecting others. E.g.,
 ```javascript
 var amqp = require('amqplib-easy');
