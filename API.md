@@ -50,7 +50,6 @@ var connection = amqplib('amqp://guest:guest@localhost:1337');
 
 conneciton.close();
 ```
-See above at [`closeConnection`](#closeconnectionamqpurl---promise).
 
 ### `Config`
 Recognized properties follow
