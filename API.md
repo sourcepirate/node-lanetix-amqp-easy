@@ -3,6 +3,7 @@
 - [`AMQP.publish(config, key, message, [options])`](#amqppublishconfig-key-message-options---promise)
 - [`AMQP.sendToQueue(config, message, [options])`](#amqpsendtoqueueconfig-message-options---promise)
 - [`AMQP.connect()`](#amqpconnect---promise)
+- [`AMQP.close()`](#amqpclose---promise)
 - [`Config`](#config)
 
 ### `Create(amqpUrl, [socketOptions])` -> `AMQP`
