@@ -234,4 +234,3 @@ module.exports = function (amqpUrl, socketOptions) {
 }
 
 module.exports.close = cleanup
-module.exports.closeConnection = closeConnection
