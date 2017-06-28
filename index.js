@@ -47,6 +47,10 @@ module.exports = function (amqpUrl, socketOptions) {
     return connections[amqpUrl]
   }
 
+  function close () {
+    return closeConnection(amqpUrl)
+  }
+
   function sendChannel () {
     if (!sendChannels[amqpUrl]) {
       sendChannels[amqpUrl] = connect()
@@ -222,6 +226,7 @@ module.exports = function (amqpUrl, socketOptions) {
 
   return {
     connect: connect,
+    close: close,
     consume: consume,
     publish: publish,
     sendToQueue: sendToQueue

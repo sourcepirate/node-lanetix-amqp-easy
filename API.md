@@ -14,7 +14,7 @@ var amqp = require('amqplib-easy')('amqp://guest:guest@localhost');
 [`socketOptions`](http://www.squaremobius.net/amqp.node/channel_api.html#connect)
 default to `maxChannels: 100`.
 
-### `closeConnection(amqpUrl)`
+### `closeConnection(amqpUrl)` -> `Promise`
 Close an `AMQP` and delete its `connection` & `sendChannel` specified by `amqpUrl` without affecting others. E.g.,
 ```javascript
 var amqp = require('amqplib-easy');
@@ -53,6 +53,9 @@ and sent.
 Returns [`amqplib` connection]
 (http://www.squaremobius.net/amqp.node/channel_api.html#models)
 for handling use cases not covered by this library, e.g., deleting queues.
+
+### `AMQP.close()` --> `Promise`
+See above at [`closeConnection`](#closeconnectionamqpurl---promise).
 
 ### `Config`
 Recognized properties follow
