@@ -3,6 +3,7 @@
 - [`AMQP.publish(config, key, message, [options])`](#amqppublishconfig-key-message-options---promise)
 - [`AMQP.sendToQueue(config, message, [options])`](#amqpsendtoqueueconfig-message-options---promise)
 - [`AMQP.connect()`](#amqpconnect---promise)
+- [`AMQP.close()`](#amqpclose---promise)
 - [`Config`](#config)
 
 ### `Create(amqpUrl, [socketOptions])` -> `AMQP`
@@ -41,6 +42,15 @@ and sent.
 Returns [`amqplib` connection]
 (http://www.squaremobius.net/amqp.node/channel_api.html#models)
 for handling use cases not covered by this library, e.g., deleting queues.
+
+### `AMQP.close()` -> `Promise`
+Close the `AMQP` and delete its `connection` & `sendChannel` without affecting others. E.g.,
+```javascript
+var amqp = require('amqplib-easy');
+var connection = amqplib('amqp://guest:guest@localhost:1337');
+
+conneciton.close();
+```
 
 ### `Config`
 Recognized properties follow

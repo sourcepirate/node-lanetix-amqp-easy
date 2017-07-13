@@ -284,6 +284,42 @@ describe('amqplib-easy', function () {
 })
 
 describe('Connection managment', function () {
+  it('should close and delete connection – no reuse', function (done) {
+    amqp.connect()
+      .then(function (connection1) {
+        return amqp.close().then(function () {
+          amqp.connect()
+            .then(function (connection2) {
+              connection1.should.not.equal(connection2)
+              done()
+            })
+        })
+      })
+      .catch(done)
+  })
+
+  it('should close/delete connection and reconnect on consume', function (done) {
+    amqp.connect()
+      .then(function (connection1) {
+        return amqp.close().then(function () {
+          amqp.consume({
+            exchange: 'cat',
+            queue: 'found_cats',
+            topics: ['found.*']
+          },
+          function () {
+            done('Got a cat')
+          }).catch(done)
+          .then(function () {
+            amqp.connect().then(function () {
+              done()
+            })
+          })
+        })
+      })
+      .catch(done)
+  })
+
   it('should reuse the existing connection', function (done) {
     amqp.connect()
       .then(function (connection1) {

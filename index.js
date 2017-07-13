@@ -8,23 +8,22 @@ var diehard = require('diehard')
 var connections = {}
 var sendChannels = {}
 
+function closeConnection (connectionUrl) {
+  return connections[connectionUrl]
+    .then(function (connection) {
+      return connection.close()
+    }).catch(function (err) {
+      // this catch is necessary so that all single connections get closed and
+      // cleared, even if they are not established, without affection others.
+      console.warn(err.toString())
+    }).then(function () {
+      delete connections[connectionUrl]
+      delete sendChannels[connectionUrl]
+    })
+}
+
 function cleanup (done) {
-  return Promise.map(
-    Object.keys(connections),
-    function (connectionUrl) {
-      return connections[connectionUrl]
-        .then(function (connection) {
-          return connection.close()
-        }).catch(function (err) {
-          // this catch is necessary so that all single connections get closed and
-          // cleared, even if they are not established, without affection others.
-          console.warn(err.toString())
-        })
-    })
-    .then(function () {
-      connections = {}
-      sendChannels = {}
-    })
+  return Promise.map(Object.keys(connections), closeConnection)
     .nodeify(done)
 }
 
@@ -46,6 +45,10 @@ module.exports = function (amqpUrl, socketOptions) {
       connections[amqpUrl] = Promise.resolve(amqp.connect(amqpUrl, socketOptions))
     }
     return connections[amqpUrl]
+  }
+
+  function close () {
+    return closeConnection(amqpUrl)
   }
 
   function sendChannel () {
@@ -223,6 +226,7 @@ module.exports = function (amqpUrl, socketOptions) {
 
   return {
     connect: connect,
+    close: close,
     consume: consume,
     publish: publish,
     sendToQueue: sendToQueue
