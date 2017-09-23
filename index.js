@@ -36,7 +36,7 @@ function toBuffer (obj) {
 
 function jsonDecoder (message) {
   if (!(message && message.content)) return null
-  return JSON.parse(message.content)
+  return JSON.parse(message.content.toString())
 }
 
 diehard.register(cleanup)
