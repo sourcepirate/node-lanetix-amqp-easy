@@ -52,8 +52,11 @@ describe('amqplib-easy', function () {
         },
         function (cat) {
           var name = cat.json.name
+          var payload = cat.payload
           try {
+            cat.should.have.properties(['content', 'fields', 'properties'])
             name.should.equal('Fred')
+            payload.should.be.deepEqual(cat.json)
             done()
           } catch (err) {
             done(err)
