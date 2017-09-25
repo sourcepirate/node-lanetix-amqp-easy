@@ -64,7 +64,23 @@ Recognized properties follow
 - `messageOptions`: (object) of options supported by
   [amqplib](http://www.squaremobius.net/amqp.node/channel_api.html#channel_publish).
   Defaults to an empty object
-- `parse`: (function) parse string content of message. Defaults to `JSON.parse`
+- `parse`: (function) a function which accepts raw message as an argument and returns decoded message content. 
+   
+   Defaults to `jsonDecoder` which simply converts json encoded message content to `Object` by calling `JSON.parse`.
+   The raw message passed as an argument have the following properties:
+
+   ```javascript
+   {
+     content: Buffer,
+     fields: Object,
+     properties: Object
+   } 
+   ```
+
+   See
+   [amqplib.channelConsume](http://www.squaremobius.net/amqp.node/channel_api.html#channel_consume)
+   for more information.
+
 - `prefetch`: (number) of messages to fetch when consuming. Defaults to `1`
 - `arguments`: (object) containing any binding arguments for the queue. Defaults to `{}`
 - `queue`: (string) name of the queue to use

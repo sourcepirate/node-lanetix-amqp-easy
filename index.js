@@ -34,6 +34,11 @@ function toBuffer (obj) {
   return new Buffer(JSON.stringify(obj))
 }
 
+function jsonDecoder (message) {
+  if (!(message && message.content)) return null
+  return JSON.parse(message.content.toString())
+}
+
 diehard.register(cleanup)
 
 module.exports = function (amqpUrl, socketOptions) {
@@ -78,7 +83,7 @@ module.exports = function (amqpUrl, socketOptions) {
     var options = defaults({}, queueConfig || {}, {
       exchangeType: 'topic',
       exchangeOptions: {durable: true},
-      parse: JSON.parse,
+      parse: jsonDecoder,
       queueOptions: {durable: true},
       prefetch: 1,
       arguments: {}
@@ -120,7 +125,7 @@ module.exports = function (amqpUrl, socketOptions) {
             function parse (msg) {
               return function () {
                 try {
-                  msg.json = options.parse(msg.content.toString())
+                  msg.payload = msg.json = options.parse(msg)
                   return handler(msg, ch)
                 } catch (err) {
                   console.error('Error deserializing AMQP message content.', err)
