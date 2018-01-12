@@ -38,9 +38,9 @@ Found a cat named Sally
 Found a cat named Fred
 ```
 
-###[API](API.md)
+### [API](API.md)
 
-###Logging
+### Logging
 All methods return a promise, so you can attach logging to them via the
 following.
 ```javascript
@@ -49,7 +49,7 @@ amqp.sendToQueue({ queue: 'found_cats' }, { name: 'Fred' })
   .catch(function (err) { console.error('sending failed', err); });
 ```
 
-###Connection Cleanup
+### Connection Cleanup
 
 [diehard](https://www.npmjs.com/package/diehard) is used for cleaning up
 connections before the process exits. To ensure connections are cleaned up,
